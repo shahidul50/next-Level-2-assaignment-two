@@ -79,8 +79,7 @@ A complete backend API for managing vehicles, bookings, users, and role-based ac
 
 ```bash
    PORT = 5000
-   DB_CON_STRING=postgresql://postgres:Admin12345@localhost:5432/vehicle-rental-db
-   JWT_SECRET=$2b$10$VMa3tY5zA62a5dR7fXJQEOUdOcubzbfmaFS
+   DB_CON_STRING='postgresql://neondb_owner:npg_TvDF3hxVBC6e@ep-patient-violet-a1jiutyz-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
 ```
 
 ### 4️⃣ Run the Server
