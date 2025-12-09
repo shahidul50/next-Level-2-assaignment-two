@@ -14,6 +14,11 @@ app.use(express.json());
 //db initialize
 initDB();
 
+//root route
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).send("Welcome to daily vehicle rental application.");
+});
+
 //health route
 app.get("/api/v1", (req: Request, res: Response) => {
   res.status(200).send("Health status ok.");
