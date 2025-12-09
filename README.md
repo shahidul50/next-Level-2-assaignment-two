@@ -6,7 +6,7 @@ A complete backend API for managing vehicles, bookings, users, and role-based ac
 
 ## 🌐 Live Deployment
 
-🔗 API Base URL:
+🔗 API Base URL: https://vehicle-rental-backend-app.vercel.app
 
 <hr>
 
@@ -198,8 +198,8 @@ POST /api/v1/vehicles
 
 Request Headers
 
-```json
-Authorization: Bearer <jwt_token>
+```bash
+ Authorization: Bearer <jwt_token>
 ```
 
 Request Body
@@ -752,4 +752,4 @@ Success Response (200 OK) - Returned
 
 ## 🌐 Live Deployment
 
-🔗
+🔗 https://vehicle-rental-backend-app.vercel.app
