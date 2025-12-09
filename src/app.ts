@@ -4,7 +4,6 @@ import { authRoutes } from "./modules/auth/auth.routes";
 import { userRoutes } from "./modules/user/user.routes";
 import { vehicleRoutes } from "./modules/vehicle/vehicle.routes";
 import { bookingRoutes } from "./modules/booking/booking.routes";
-import updateBookingStatusBySystem from "./helpers/updateBookingStatusBySystem";
 
 export const app = express();
 
@@ -23,9 +22,6 @@ app.get("/", (req: Request, res: Response) => {
 app.get("/api/v1", (req: Request, res: Response) => {
   res.status(200).send("Health status ok.");
 });
-
-//System: Auto-mark as "returned" when period ends
-updateBookingStatusBySystem();
 
 //auth route
 app.use("/api/v1/auth", authRoutes);
