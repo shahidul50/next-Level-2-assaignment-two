@@ -8,7 +8,7 @@ interface VehicleResult {
 }
 
 const castDailyRentPriceStringToNumber = (result: VehicleResult[]) => {
-  let modifiedResult;
+  let modifiedResult = [];
   if (result.length !== 0) {
     modifiedResult = result?.map((vehicle: any) => {
       return {
