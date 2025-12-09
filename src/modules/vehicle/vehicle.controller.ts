@@ -97,12 +97,13 @@ const createVehicle = async (req: Request, res: Response) => {
 
       //create new vehicle
       const result: any = await vehicleService.createVehicle(req.body);
+      const modifiedResult = castDailyRentPriceStringToNumber(result.rows);
       SendSuccess(
         res,
         201,
         true,
         "Vehicle created successfully",
-        result.rows[0]
+        modifiedResult
       );
     } catch (error: any) {
       SendError(res, 500, false, "Internal Server Error", error.message);
