@@ -3,6 +3,7 @@ import { SendError, SendSuccess } from "../../helpers/sendResponse";
 import { vehicleService } from "./vehicle.service";
 import { bookingService } from "../booking/booking.service";
 import castDailyRentPriceStringToNumber from "../../helpers/castRentPriceStringToNumber";
+import updateBookingStatusBySystem from "../../helpers/updateBookingStatusBySystem";
 
 const createVehicle = async (req: Request, res: Response) => {
   if (req.body !== undefined) {
@@ -119,6 +120,8 @@ const createVehicle = async (req: Request, res: Response) => {
   }
 };
 const getAllVehicle = async (req: Request, res: Response) => {
+  //System: Auto-mark as "returned" when period ends
+  updateBookingStatusBySystem();
   try {
     //get all vehicle from database
     const result: any = await vehicleService.getAllVehicle();
@@ -137,6 +140,8 @@ const getAllVehicle = async (req: Request, res: Response) => {
 
 const getVehicleById = async (req: Request, res: Response) => {
   const vehicleId = req.params.vehicleId;
+  //System: Auto-mark as "returned" when period ends
+  updateBookingStatusBySystem();
   try {
     if (vehicleId) {
       //get vehicle details by id from database

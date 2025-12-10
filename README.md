@@ -79,8 +79,8 @@ A complete backend API for managing vehicles, bookings, users, and role-based ac
 
 ```bash
    PORT = 5000
-   DB_CON_STRING='postgresql://neondb_owner:npg_TvDF3hxVBC6e@ep-patient-violet-a1jiutyz-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
-   JWT_SECRET=$2b$10$VMa3tY5zA62a5dR7fXJQEOUdOcubzbfmaFS
+   DB_CON_STRING= your postgreSQL connection string
+   JWT_SECRET=$2b$10$VMa3tY5zA62a5dR7
 ```
 
 ### 4️⃣ Run the Server

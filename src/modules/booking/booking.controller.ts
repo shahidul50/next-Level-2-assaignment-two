@@ -5,23 +5,13 @@ import { vehicleService } from "../vehicle/vehicle.service";
 import { bookingService } from "./booking.service";
 import { userService } from "../user/user.service";
 import updateBookingStatusBySystem from "../../helpers/updateBookingStatusBySystem";
+import getLocalDate from "../../helpers/getLocalDate";
 
 const createBooking = async (req: Request, res: Response) => {
   if (req.body !== undefined) {
     const isAdmin = req.user?.role === "admin";
     const isCustomer = req.user?.role === "customer";
     const customer = req.user;
-
-    //checking customerId isn't empty when admin logged in
-    if (req.body.customer_id === undefined && isAdmin === true) {
-      return SendError(
-        res,
-        400,
-        false,
-        "Validation failed",
-        "Customer Id is required!"
-      );
-    }
 
     //checking vehicleId isn't empty
     if (req.body.vehicle_id === undefined) {
@@ -45,6 +35,17 @@ const createBooking = async (req: Request, res: Response) => {
         false,
         "Validation failed",
         "Rent start date is required!"
+      );
+    }
+
+    //checking rent_start_date is previous date or not
+    if (new Date(req.body.rent_start_date) < new Date()) {
+      return SendError(
+        res,
+        400,
+        false,
+        "Validation failed",
+        "Sorry you can't set previous date!"
       );
     }
     //checking rent end date isn't empty
@@ -89,29 +90,36 @@ const createBooking = async (req: Request, res: Response) => {
 
       let dbUser;
       if (isAdmin) {
-        dbUser = await userService.getUserById(req.body.customer_id);
+        const userId = req.body.customer_id
+          ? req.body.customer_id
+          : req.user?.id;
+        dbUser = await userService.getUserById(userId);
       }
 
       if (isCustomer) {
         dbUser = await userService.getUserById(customer?.id);
       }
 
-      const isExistCustomer = dbUser?.rowCount === 0 ? false : true;
+      if (req.body.customer_id) {
+        const isExistCustomer = dbUser?.rowCount === 0 ? false : true;
 
-      //checking is user(customer) exist or not
-      if (!isExistCustomer) {
-        return SendError(
-          res,
-          404,
-          false,
-          "User not found",
-          "No user found with the given ID"
-        );
+        //checking is user(customer) exist or not
+        if (!isExistCustomer) {
+          return SendError(
+            res,
+            404,
+            false,
+            "User not found",
+            "No user found with the given ID"
+          );
+        }
       }
 
       //get number of booking days
-      const numberOfDays: number =
-        getDaysBetween(req.body.rent_start_date, req.body.rent_end_date) + 1;
+      const numberOfDays: number = getDaysBetween(
+        req.body.rent_start_date,
+        req.body.rent_end_date
+      );
       //calculate total price for rent
       const totalPrice: number =
         Number(selectedVehicleDetails.rows[0].daily_rent_price) * numberOfDays;
@@ -119,7 +127,9 @@ const createBooking = async (req: Request, res: Response) => {
 
       if (isAdmin) {
         finalBookingObj = {
-          customer_id: req.body.customer_id,
+          customer_id: req.body.customer_id
+            ? req.body.customer_id
+            : req.user?.id,
           vehicle_id: req.body.vehicle_id,
           rent_start_date: req.body.rent_start_date,
           rent_end_date: req.body.rent_end_date,
@@ -150,12 +160,8 @@ const createBooking = async (req: Request, res: Response) => {
 
       const responseData = {
         ...result?.rows[0],
-        rent_start_date: new Date(result?.rows[0].rent_start_date)
-          .toISOString()
-          .split("T")[0],
-        rent_end_date: new Date(result?.rows[0].rent_end_date)
-          .toISOString()
-          .split("T")[0],
+        rent_start_date: getLocalDate(result?.rows[0].rent_start_date),
+        rent_end_date: getLocalDate(result?.rows[0].rent_end_date),
         total_price: Number(result?.rows[0].total_price),
 
         vehicle: {
@@ -175,7 +181,7 @@ const createBooking = async (req: Request, res: Response) => {
       400,
       false,
       "Validation Error",
-      "Please provide customer_id, vehicle_id, rent_start_date, rent_end_date"
+      "Please provide customer_id(if you admin), vehicle_id, rent_start_date, rent_end_date"
     );
   }
 };
@@ -202,12 +208,8 @@ const getAllBooking = async (req: Request, res: Response) => {
           );
           const obj = {
             ...booking,
-            rent_start_date: new Date(booking.rent_start_date)
-              .toISOString()
-              .split("T")[0],
-            rent_end_date: new Date(booking.rent_end_date)
-              .toISOString()
-              .split("T")[0],
+            rent_start_date: getLocalDate(booking.rent_start_date),
+            rent_end_date: getLocalDate(booking.rent_end_date),
             total_price: Number(booking.total_price),
             customer: {
               name: customerDetails.rows[0].name,
@@ -238,12 +240,8 @@ const getAllBooking = async (req: Request, res: Response) => {
           );
           const obj = {
             ...booking,
-            rent_start_date: new Date(booking.rent_start_date)
-              .toISOString()
-              .split("T")[0],
-            rent_end_date: new Date(booking.rent_end_date)
-              .toISOString()
-              .split("T")[0],
+            rent_start_date: getLocalDate(booking.rent_start_date),
+            rent_end_date: getLocalDate(booking.rent_end_date),
             total_price: Number(booking.total_price),
             vehicle: {
               vehicle_name: vehicleDetails.rows[0].vehicle_name,
@@ -369,12 +367,8 @@ const updateBooking = async (req: Request, res: Response) => {
 
         const modifiedResult = {
           ...result.rows[0],
-          rent_start_date: new Date(result?.rows[0].rent_start_date)
-            .toISOString()
-            .split("T")[0],
-          rent_end_date: new Date(result?.rows[0].rent_end_date)
-            .toISOString()
-            .split("T")[0],
+          rent_start_date: getLocalDate(result?.rows[0].rent_start_date),
+          rent_end_date: getLocalDate(result?.rows[0].rent_end_date),
           total_price: Number(result.rows[0].total_price),
           vehicle: {
             availability_status: updateVehicle.rows[0].availability_status,
@@ -399,12 +393,8 @@ const updateBooking = async (req: Request, res: Response) => {
         );
         const modifiedResult = {
           ...result?.rows[0],
-          rent_start_date: new Date(result?.rows[0].rent_start_date)
-            .toISOString()
-            .split("T")[0],
-          rent_end_date: new Date(result?.rows[0].rent_end_date)
-            .toISOString()
-            .split("T")[0],
+          rent_start_date: getLocalDate(result?.rows[0].rent_start_date),
+          rent_end_date: getLocalDate(result?.rows[0].rent_end_date),
           total_price: Number(result.rows[0].total_price),
         };
         SendSuccess(

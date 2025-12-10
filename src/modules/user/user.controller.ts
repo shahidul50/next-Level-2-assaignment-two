@@ -139,7 +139,7 @@ const updateUser = async (req: Request, res: Response) => {
       if (password) {
         hashPassword = await bcrypt.hash(password, 10);
       }
-      //dynamic update query
+      //create dynamic update query
       const fields = [];
       const values = [];
       let index = 1;
@@ -151,7 +151,7 @@ const updateUser = async (req: Request, res: Response) => {
 
       if (email) {
         fields.push(`email = $${index++}`);
-        values.push(email);
+        values.push(email.toLowerCase());
       }
 
       if (phone) {
@@ -171,6 +171,7 @@ const updateUser = async (req: Request, res: Response) => {
 
       values.push(userId);
 
+      //if all condition ok then update the user
       const updatedResult = await userService.updateUser(fields, values, index);
 
       SendSuccess(

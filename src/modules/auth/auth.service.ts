@@ -3,7 +3,15 @@ import { pool } from "../../config/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-const Signup = async (payload: Record<string, unknown>) => {
+interface IUser {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  role: string;
+}
+
+const Signup = async (payload: IUser) => {
   const { name, email, password, phone, role } = payload;
 
   //hashing user password for Safety
@@ -11,7 +19,7 @@ const Signup = async (payload: Record<string, unknown>) => {
 
   return await pool.query(
     `INSERT INTO users(name,email,password,phone,role)VALUES($1, $2, $3, $4, $5) RETURNING id, name, email, phone,role`,
-    [name, email, hashPassword, phone, role]
+    [name, email.toLowerCase(), hashPassword, phone, role]
   );
 };
 
